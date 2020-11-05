@@ -4,27 +4,38 @@ namespace App\Services;
 
 use App\Models\EventDay;
 use App\Models\Event;
+use Illuminate\Database\DatabaseManager;
 
 class EventService
 {
+    protected $db;
+
     protected $event;
 
     protected $event_days;
 
     public function __construct(
+        DatabaseManager $db,
         Event $event,
         EventDay $event_days
     ) {
+        $this->db = $db;
         $this->event = $event;
         $this->event_days = $event_days;
     }
 
     public function save($data)
     {
-        $event = $this->saveEvent($data);
-        $this->saveDays($event, $data['days_selected']);
-
-        return $event;
+        $this->db->beginTransaction();
+        try {
+            $event = $this->saveEvent($data);
+            $this->saveDays($event, $data['days_selected']);
+            $this->db->commit();
+            return $event;
+        } catch (\Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
     }
 
     protected function saveEvent($data)
