@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Ajax\EventsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::prefix('ajax')->group(function () {
+    Route::post('/save-event', [EventsController::class, 'save']);
+});
 
 Route::get('/', function () {
     return view('app');
