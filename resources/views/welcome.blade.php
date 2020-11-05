@@ -22,8 +22,13 @@
         <link rel="stylesheet" href="{{ URL::asset('css/app.css') }}">
     </head>
     <body class="antialiased">
-        Test
-        <div id="app"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="app"></div>
+                </div>
+            </div>
+        </div>
     </body>
 
     <script src="/js/manifest.js"></script>
