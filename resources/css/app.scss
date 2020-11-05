@@ -1,9 +1,7 @@
 @import "~bootstrap/scss/bootstrap";
 
-input[type="text"] {
-    background:red !important;
-}
-
-input {
-    background: green !important;
+.vdp-datepicker {
+    input.form-control {
+        background: #ffffff;
+    }
 }
