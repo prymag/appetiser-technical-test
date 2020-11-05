@@ -5,7 +5,7 @@
             <Form @submitted="onFormSubmitted"/>
         </div>
         <div class="col-md-8">
-            <Calendar :event_name="event_name" :event_dates="event_dates" />
+            <Calendar :event_name="event_name" :start="range_start" :end="range_end" :days="days"/>
         </div>
     </div>
 </div>
@@ -20,8 +20,10 @@ export default {
     name: 'App',
     data() {
         return {
-            event_name: '',
-            event_dates: []
+            event_name: 'Test',
+            range_start: new Date('2020-10-01'),
+            range_end: new Date('2020-12-05'),
+            days: ['sun', 'mon', 'wed']
         }
     },
     components: {

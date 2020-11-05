@@ -2,6 +2,13 @@
     <div>
         <a href="#" @click="prevMonth">Prev</a> {{monthName}} <a href="#" @click="nextMonth">Next</a>
         <div class="days d-flex flex-column">
+            <div class="alert alert-info">
+                <h6><span class="flex-fill">Event: {{ event_name }}</span></h6>
+                <div class="d-flex flex-row">
+                    <span class="flex-fill">From: {{ eventStart }}</span>
+                    <span class="flex-fill">To: {{ eventEnd }}</span>
+                </div>
+            </div>
             <div class="day border d-flex flex-row" v-for="(day, index) in daysInMonth"
                 v-bind:key="index">
                 <div class="date-info p-3 bg-secondary" v-html="formatDate(day)">
@@ -19,24 +26,35 @@
 <script>
 export default {
     name: 'Calendar',
-    props: ['date', 'event_dates', 'event_name'],
+    props: ['event_name', 'start', 'end', 'days'],
     data() {
         return {
             the_date:'',
-            the_events: ['2020-11-01'],
+        }
+    },
+    created() {
+        if (!this.$props.start && !this.$props.end) {
+            this.the_date = new Date();
+            this.the_date.setHours(0, 0, 0);
+        }
+
+        if (this.$props.start) {
+            this.$props.start.setHours(0, 0, 0);
+            this.the_date = new Date(this.$props.start.getFullYear(), this.$props.start.getMonth(), 1);
+        }
+
+        if (this.$props.end) {
+            this.$props.end.setHours(0,0,0);
         }
     },
     methods: {
         isDayInEvent(date) {
-            if (!this.event_dates) {
+            if (date < this.$props.start || date > this.$props.end) {
                 return false;
             }
 
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1; // Count starts at 0
-            const day = ('0' + date.getDate()).slice(-2); // convert to two digits
-
-            return this.event_dates.indexOf(`${year}-${month}-${day}`) !== -1;
+            const day_str = this.getDayString(date);
+            return this.$props.days.indexOf(day_str) !== -1;
         },
         prevMonth(e) {
             e.preventDefault();
@@ -47,10 +65,22 @@ export default {
             this.the_date = new Date(this.the_date.getFullYear(), this.the_date.getMonth() + 1, 1);
             console.log('Called');
         },
+        toHumanDate(date) {
+            const months = [
+                'January', 'February', 'March', 'April', 
+                'May', 'June', 'July', 'August',
+                'September', 'October', 'November', 'December'
+            ];
+
+            return `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()}`;
+        },
         formatDate(date) {
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             return `<span class="date">${date.getDate()}</span> 
-                <span class="day">${days[date.getDay()]}</span>`;
+                <span class="day">${this.getDayString(date)}</span>`;
+        },
+        getDayString(date) {
+            const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+            return days[date.getDay()];
         },
         getLastDayOfMonth(date) {
             return new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -73,10 +103,6 @@ export default {
     },
     computed: {
         monthName: function() {
-            if (!this.$props.date && this.the_date == '') {
-                this.the_date = new Date();
-            }
-
             const monthName = this.the_date.toLocaleString('default', { month: 'long' });
             return monthName;
         },
@@ -86,6 +112,12 @@ export default {
 
             const days = this.createDays(start, end);
             return days;
+        },
+        eventStart: function() {
+            return this.toHumanDate(this.$props.start);
+        },
+        eventEnd: function() {
+            return this.toHumanDate(this.$props.end);
         }
     }
 }
@@ -96,6 +128,10 @@ export default {
     .date-info {
         width: 15%;
         color: #ffffff;
+
+        .day {
+            text-transform: capitalize;
+        }
     }
 }
 </style>
