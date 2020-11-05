@@ -22,7 +22,6 @@
         <link rel="stylesheet" href="{{ URL::asset('css/app.css') }}">
     </head>
     <body class="antialiased">
-        Test
         <div id="app"></div>
     </body>
 
