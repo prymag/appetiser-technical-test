@@ -2,10 +2,19 @@
 <div class="container">
     <div class="row">
         <div class="col-md-4">
-            <Form @submitted="onFormSubmitted"/>
+            <div class="form-wrapper">
+                <Form 
+                    @submitted="onFormSubmitted" 
+                    :submission_errors="validation_errors" />
+                <div class="loading-overlay" v-if="is_loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-8">
-            <Calendar :event_name="event_name" :start="range_start" :end="range_end" :days="days"/>
+            <Calendar :event_name="event_name" :start="date_start" :end="date_end" :days="days_selected"/>
         </div>
     </div>
 </div>
@@ -20,10 +29,12 @@ export default {
     name: 'App',
     data() {
         return {
-            event_name: 'Test',
-            range_start: new Date('2020-10-01'),
-            range_end: new Date('2020-12-05'),
-            days: ['sun', 'mon', 'wed']
+            validation_errors: [],
+            event_name: null,
+            date_start: null,
+            date_end: null,
+            days_selected: [],
+            is_loading: false
         }
     },
     components: {
@@ -32,21 +43,53 @@ export default {
     },
     methods: {
         onFormSubmitted(formData) {
-            axios.get('/ajax/save-event').then(result => {
-                this.event_name = 'Testing';
-                this.event_dates = ['2020-11-01', '2020-11-13'];
-            });
-            console.log(formData);
+            this.is_loading = true;
+            axios.post('/ajax/save-event', formData)
+                .then(response => {
+                    this.is_loading = false;
+                    if (!response.data.success) {
+                        return;
+                    }
+                    this.event_name = response.data.event_info.event_name;
+                    this.date_start = new Date(response.data.event_info.date_start);
+                    this.date_end = new Date(response.data.event_info.date_end);
+                    this.days_selected = response.data.event_info.days_selected;
+                }).catch((err) => {
+                    this.is_loading = false;
+                    if (err.response.data.type == 'validation') {
+                        this.validation_errors = err.response.data.errors;
+                    }
+                });
         }
     }
 }
 </script>
 
-<style>
-#advanced_search {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
+<style lang="scss" scoped>
+.form-wrapper {
+    position: relative;
+
+    .loading-overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.3);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        
+        .spinner-border {
+            position: absolute;
+            display: block;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            margin: auto;
+            z-index: 20;
+        }
+    }
 }
 </style>
