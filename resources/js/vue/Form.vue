@@ -1,6 +1,5 @@
 <template>
     <div class="form">
-
         <div class="alert alert-danger" v-if="errors.length">
             <ul>
                 <li v-for="(error, index) in errors" :key="index">{{error}}</li>
@@ -26,7 +25,7 @@
             </div>
         </div>
         <strong>Days</strong>
-        <div class="d-flex flex-wrap">
+        <div class="d-flex flex-wrap p-3">
             <div class="form-check p-3 mr-2" v-for="day in days"
                 v-bind:key="day">
                 <input class="form-check-input" 
@@ -38,7 +37,9 @@
                 <label class="form-check-label" :for="`day_${day}`">{{day}}</label>
             </div>
         </div>
-        <button @click="submit">Submit</button>
+        <div class="text-center">
+            <button class="btn btn-primary" :disabled="disable_submit" @click="submit">Submit</button>
+        </div>
     </div>
 </template>
 
@@ -47,16 +48,17 @@ import Datepicker from 'vuejs-datepicker';
 
 export default {
     name: 'Form',
+    props: ['submission_errors', 'disable_submit'],
     data() {
         return {
-            event_name: 'The name',
+            event_name: '',
             date_start: '',
             date_end: '',
             format: "yyyy-MM-dd",
             days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
             days_selected: [],
             is_valid: true,
-            errors: []
+            errors: [],
         }
     },
     components: {
@@ -65,6 +67,7 @@ export default {
     methods: {
         validate() {
             this.errors = [];
+            this.is_valid = true;
 
             if (this.event_name == '') {
                 this.is_valid = false;
@@ -105,23 +108,24 @@ export default {
 
             const data = {
                 event_name: this.event_name,
-                date_start: this.date_start,
-                date_end: this.date_end,
+                date_start: this.formatDate(this.date_start),
+                date_end: this.formatDate(this.date_end),
                 days_selected: this.days_selected
             }
+            
             this.$emit('submitted', data);
         },
         formatDate(date) {
             // Date is formatted as YYYY/MM/DD
             // change the slash to dash
-            return date.replace(/\//g, '-');
-        },
-        onDateStartChanged(date) {
-            this.date_start = this.formatDate(date);
-        },
-        onDateEndChanged(date) {
-            this.date_end = this.formatDate(date);
+            const the_date = ('0' + date.getDate()).slice(-2);
+            return `${date.getFullYear()}-${date.getMonth()+1}-${the_date}`;
         }
-    }
+    },
+    watch: {
+        submission_errors: function(newVal, oldVal) {
+            this.errors = newVal;
+        }
+    },
 }
 </script>
