@@ -1,8 +1,12 @@
 <template>
     <div>
-        <a href="#" @click="prevMonth">Prev</a> {{monthName}} <a href="#" @click="nextMonth">Next</a>
+        <div class="nav d-flex align-items-center justify-content-center">
+            <a href="#" class="prev" @click="prevMonth">&laquo;</a> 
+            <h3 class="mb-0">{{monthName}} {{the_date.getFullYear()}}</h3>
+            <a href="#" class="next" @click="nextMonth">&raquo;</a>
+        </div>
         <div class="days d-flex flex-column">
-            <div class="alert alert-info">
+            <div class="alert alert-info" v-if="start && end">
                 <h6><span class="flex-fill">Event: {{ event_name }}</span></h6>
                 <div class="d-flex flex-row">
                     <span class="flex-fill">From: {{ eventStart }}</span>
@@ -49,7 +53,7 @@ export default {
     },
     methods: {
         isDayInEvent(date) {
-            if (date < this.$props.start || date > this.$props.end) {
+            if (!this.$props.days || date < this.$props.start || date > this.$props.end) {
                 return false;
             }
 
@@ -63,7 +67,6 @@ export default {
         nextMonth(e) {
             e.preventDefault();
             this.the_date = new Date(this.the_date.getFullYear(), this.the_date.getMonth() + 1, 1);
-            console.log('Called');
         },
         toHumanDate(date) {
             const months = [
@@ -124,7 +127,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.days {
+.nav {
+    margin-bottom: 20px;
+    .prev,
+    .next {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        color: #ffffff;
+        background: #343a40;
+        text-align: center;
+        margin:0 10px;
+        text-decoration: none;
+    }
+    h3 {
+        display: block;
+        width: 250px;
+        text-align:center;
+    }
+}
+::v-deep .days {
     .date-info {
         width: 15%;
         color: #ffffff;
