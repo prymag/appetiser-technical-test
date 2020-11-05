@@ -37,19 +37,7 @@ export default {
         }
     },
     created() {
-        if (!this.$props.start && !this.$props.end) {
-            this.the_date = new Date();
-            this.the_date.setHours(0, 0, 0);
-        }
-
-        if (this.$props.start) {
-            this.$props.start.setHours(0, 0, 0);
-            this.the_date = new Date(this.$props.start.getFullYear(), this.$props.start.getMonth(), 1);
-        }
-
-        if (this.$props.end) {
-            this.$props.end.setHours(0,0,0);
-        }
+       this.setDate();
     },
     methods: {
         isDayInEvent(date) {
@@ -102,6 +90,21 @@ export default {
             }
 
             return days;
+        },
+        setDate() {
+            if (!this.$props.start && !this.$props.end) {
+                this.the_date = new Date();
+                this.the_date.setHours(0, 0, 0);
+            }
+
+            if (this.$props.start) {
+                this.$props.start.setHours(0, 0, 0);
+                this.the_date = new Date(this.$props.start.getFullYear(), this.$props.start.getMonth(), 1);
+            }
+
+            if (this.$props.end) {
+                this.$props.end.setHours(0,0,0);
+            }
         }
     },
     computed: {
@@ -121,6 +124,14 @@ export default {
         },
         eventEnd: function() {
             return this.toHumanDate(this.$props.end);
+        }
+    },
+    watch: {
+        start: function(newVal, oldVal) {
+            this.setDate();
+        },
+        end: function(newVal, oldVal) {
+            this.setDate();
         }
     }
 }
