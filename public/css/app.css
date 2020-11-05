@@ -10903,11 +10903,7 @@ a.text-dark:focus {
   }
 }
 
-input[type=text] {
-  background: red !important;
-}
-
-input {
-  background: green !important;
+.vdp-datepicker input.form-control {
+  background: #ffffff;
 }
 
