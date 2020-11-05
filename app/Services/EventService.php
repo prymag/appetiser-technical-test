@@ -23,6 +23,8 @@ class EventService
     {
         $event = $this->saveEvent($data);
         $this->saveDays($event, $data['days_selected']);
+
+        return $event;
     }
 
     protected function saveEvent($data)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Ajax;
 
 use App\Http\Controllers\Controller;
+use App\Services\EventService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Factory as Validator;
 
@@ -10,8 +11,13 @@ class EventsController extends Controller
 {
     protected $validator;
 
-    public function __construct(Validator $validator)
-    {
+    protected $event_service;
+
+    public function __construct(
+        EventService $event_service,
+        Validator $validator
+    ) {
+        $this->event_service = $event_service;
         $this->validator = $validator;
     }
 
@@ -52,8 +58,12 @@ class EventsController extends Controller
             ], 422);
         }
 
-        $data['success'] = true;
-        $data['event_info'] = $request->all();
+        $info = $this->event_service->save($request->all());
+
+        if ($info) {
+            $data['success'] = true;
+            $data['event_info'] = $request->all();
+        }
         return response()->json($data);
     }
 }
